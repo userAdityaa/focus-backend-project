@@ -10,7 +10,7 @@ router.get('/about', userController.about);
 
 router.post('/signIn', userController.signIn);
 
-router.get('/checkIn', userController.checkIn);
+
 
 router.post('/signUp', userController.signUp);
 
