@@ -2,22 +2,29 @@
 import React from 'react';
 import { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import Contact from './Contact'
 // import { set } from 'mongoose';
 
 
 
 function About(){
+  const navigate = useNavigate();
+  const handleClick = (dataStore) => {
+    console.log(dataStore.title);
+    console.log(dataStore.poster_path);
+    console.log(dataStore.overview);
+    console.log(dataStore.vote_average);
+  }
 
 
-    const [movies, setMovies] = useState([]);
-    const [genres, setGenres] = useState([]);
-    // const apiKey = '1c7d42abf229af75962d9c1185bd9ad9';
-    const [quari, setQuery] = useState('');
+  const [movies, setMovies] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [quari, setQuery] = useState('');
 
-    const handleQuery = (e) => {
+    const handleQuery = async(e) => {
       setQuery(e.target.value);
-      // console.log(quari);
-      fetchMovies(quari);
+      await fetchMovies(quari);
     }
 
 
@@ -30,24 +37,27 @@ function About(){
         console.log(response.data.results);
         setMovies(response.data.results);
         // movies.map((genre) => fetchGenres(genre.genre_ids));
-        
-        // setMovies(response.data);
+        movies.forEach(movie => {
+          fetchGenres(movie.genre_ids); // Pass movie.id to fetchGenres
+        });
         } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
 
-  // const fetchGenres = async (movieId) => {
-  //   try{
-  //     const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=1c7d42abf229af75962d9c1185bd9ad9`);
-  //     setGenres(response.data.genre_ids);
+  const fetchGenres = async (movieId) => {
+    try{
+      const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=1c7d42abf229af75962d9c1185bd9ad9`);
+      // setGenres(response.data.genre_ids);
+      // console.log(response.data.genres);
+      setGenres(response.data.genres);
       
-  //   }
-  //   catch(err){
-  //     console.log(err);
-  //   }
-  // }
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
 
     
 
@@ -70,7 +80,7 @@ function About(){
         
     </div>
 
-    <div className='w-screen mx-auto bg-[url(bg2.webp)] p-6 rounded-md shadow-md flex items-center flex-col'>
+    <div className='w-screen bg-[url(bg2.webp)] p-6 rounded-md shadow-md flex items-center flex-col'>
       <div className='bg-[url(bg2.webp)] p-4 w-[70%] flex items-start'>
       <ul className='flex flex-col items-center space-y-[3rem] list-inside w-[40%]'>
         {movies.map((container) => 
@@ -78,20 +88,20 @@ function About(){
         
 
         
-        <li className='text-lime-500 border border-amber-800 border-[1rem]' key={container.id}><img  className='w-[20rem]' src={`https://www.themoviedb.org/t/p/w440_and_h660_bestv2${container.poster_path}`}alt="" /></li>
+        <li className='text-lime-500 border border-amber-800 border-[1rem]' key={container.id}><img  className='w-[20rem]' src={`https://www.themoviedb.org/t/p/w440_and_h660_bestv2${container.poster_path}`}alt="" onClick={() => handleClick(container)}/></li>
 
   
         )}
       </ul>
       <ul className='w-[60%] space-y-[3rem] text-white text-bold '>
         {movies.map((store) => <li className='h-[32rem] w-[90%] flex flex-col ml-[2rem] border border-amber-800 border-[1rem] p-[2rem]' key={store.key}>
-          <div className='mb-[2rem]'>Title: {store.title ? store.title : store.name}</div> 
-          <div className='mb-[2rem]'>
+          <div className='mb-[1.5rem]'>Title: {store.title ? store.title : store.name}</div> 
+          <div className='mb-[1.5rem]'>
             <div>Description: </div>
             <div>{store.overview} </div>
             </div>
-          <div >Ratings: {store.vote_average}</div>
-          {/* <div>{genres.map((genre) => <span>{genre.name}</span>)}</div> */}
+          <div className='mb-[1.5rem]'>Ratings: {store.vote_average}</div>
+          <div>Genre: {genres.map((genre) => <span className='ml-[0.5rem]'>{genre.name}</span>)}</div>
           </li>)}
       </ul>
       </div>
